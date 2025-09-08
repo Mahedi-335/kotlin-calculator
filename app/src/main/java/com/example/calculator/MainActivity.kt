@@ -10,13 +10,14 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private var userInput: String = ""
+    private var lastResult: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Digits
+        // Number Buttons
         setNumberButton(binding.zero, "0")
         setNumberButton(binding.one, "1")
         setNumberButton(binding.two, "2")
@@ -28,19 +29,21 @@ class MainActivity : AppCompatActivity() {
         setNumberButton(binding.eight, "8")
         setNumberButton(binding.nine, "9")
 
-        // Operators
+        // Operators Buttons
         setNumberButton(binding.plus, "+")
         setNumberButton(binding.minus, "-")
         setNumberButton(binding.multiply, "*")
         setNumberButton(binding.percent, "%")
+        setNumberButton(binding.division,"÷")
         setNumberButton(binding.dot, ".")
 
+        // Clear All Button
         binding.clean.setOnClickListener {
             clearAll()
         }
 
-        // One Clear (Backspace)
-        binding.oneClear.setOnClickListener {
+        // Backspace Button
+        binding.backspace.setOnClickListener {
             if (userInput.isNotEmpty()) {
                 userInput = userInput.dropLast(1)
                 binding.firstText.text = userInput
@@ -53,13 +56,29 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // This function handles both numbers and operators
     private fun setNumberButton(button: android.view.View, value: String) {
         button.setOnClickListener {
+
+            if (lastResult){
+
+                // shift result history
+                binding.sixthText.text = binding.fifthText.text
+                binding.fifthText.text = binding.fourthText.text
+                binding.fourthText.text = binding.thirdText.text
+                binding.thirdText.text = binding.secondText.text
+                binding.secondText.text = binding.firstText.text
+
+                userInput = ""
+                lastResult = false
+            }
+            // Add new character to input
             userInput += value
             binding.firstText.text = userInput
         }
     }
 
+    // Reset everything
     private fun clearAll() {
         userInput = ""
         binding.firstText.text = ""
@@ -70,6 +89,7 @@ class MainActivity : AppCompatActivity() {
         binding.sixthText.text = ""
     }
 
+    // Calculate and show result
     private fun calculateResult() {
         if (userInput.isBlank()) return
 
@@ -79,30 +99,37 @@ class MainActivity : AppCompatActivity() {
             val result = ExpressionBuilder(expression).build().evaluate()
             val formatted = formateResult(result)
 
+            // Shift history
             binding.sixthText.text = binding.fifthText.text
             binding.fifthText.text = binding.fourthText.text
             binding.fourthText.text = binding.thirdText.text
             binding.thirdText.text = binding.secondText.text
             binding.secondText.text = userInput
 
-            binding.firstText.text = formatted
+            // Show result
+            binding.firstText.text = "= $formatted"
             userInput = ""
+            lastResult = true
 
         } catch (e: Exception) {
             binding.firstText.text = "Error"
         }
     }
 
+    // Replace symbols with valid operators
     private fun normalizeExpression(expr: String): String {
         var s  = expr
 
         s = s.replace("x", "*")
         s = s.replace("÷", "/")
+        s = s.replace("%","/100")
         return s
 
 
     }
 
+
+    // Formate result (int if no decimal, else double)
     private fun formateResult(result: Double): String {
         return if  (result == result.toLong().toDouble()){
             result.toLong().toString()
