@@ -5,24 +5,32 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:orientation="vertical"
-    android:padding="20dp"
+    android:paddingHorizontal="20dp"
+    android:paddingVertical="10dp"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/top"
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:text="@string/app_name" />
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/darkMood"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:thumb="@drawable/thumb"
+            app:track="@drawable/track"
+            android:checked="true"
+            />
 
-    </LinearLayout>
+
+
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/mid"
